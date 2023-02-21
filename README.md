@@ -1,2 +1,2 @@
 # Portfolio 
-Portfolio Website of David park.
+Portfolio Website of David Park.
