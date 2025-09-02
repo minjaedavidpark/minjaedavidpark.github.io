@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Delay typing effect to let page load
         setTimeout(() => {
             typeWriter(heroTitle, '', 80);
-        }, 1000);
+        }, 0);
     }
 });
 
@@ -252,10 +252,8 @@ function initTheme() {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
         setTheme(savedTheme);
-    } else if (prefersDarkScheme.matches) {
-        setTheme('dark');
     } else {
-        setTheme('light');
+        setTheme('light'); // Default to light mode
     }
 }
 
