@@ -212,9 +212,13 @@ const themeToggleBtn = document.getElementById('theme-toggle-btn');
 const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
 
 // Function to set theme
-function setTheme(theme) {
+function setTheme(theme, saveToStorage = true) {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
+    
+    // Only save to localStorage if explicitly requested
+    if (saveToStorage) {
+        localStorage.setItem('theme', theme);
+    }
     
     // Update button icon
     const icon = themeToggleBtn.querySelector('i');
@@ -244,9 +248,13 @@ function toggleTheme() {
 function initTheme() {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
-        setTheme(savedTheme);
+        console.log('Using saved theme:', savedTheme);
+        setTheme(savedTheme, true); // Save to storage
     } else {
-        setTheme('light'); // Default to light mode
+        // Use system theme preference (don't save to storage)
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        console.log('Using system theme:', prefersDark ? 'dark' : 'light');
+        setTheme(prefersDark ? 'dark' : 'light', false); // Don't save to storage
     }
 }
 
@@ -254,6 +262,38 @@ function initTheme() {
 if (themeToggleBtn) {
     themeToggleBtn.addEventListener('click', toggleTheme);
 }
+
+// Listen for system theme changes (set up immediately)
+const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+// Function to handle system theme changes
+function handleSystemThemeChange(e) {
+    const savedTheme = localStorage.getItem('theme');
+    console.log('System theme change detected:', e.matches ? 'dark' : 'light');
+    console.log('Saved theme:', savedTheme);
+    
+    if (!savedTheme) {
+        console.log('No saved theme, switching to system theme');
+        setTheme(e.matches ? 'dark' : 'light', false); // Don't save to storage
+    } else {
+        console.log('Saved theme exists, ignoring system change');
+    }
+}
+
+// Add the listener
+if (mediaQuery.addEventListener) {
+    mediaQuery.addEventListener('change', handleSystemThemeChange);
+} else {
+    // Fallback for older browsers
+    mediaQuery.addListener(handleSystemThemeChange);
+}
+
+// Test function to manually check system theme (for debugging)
+window.testSystemTheme = function() {
+    console.log('Current system theme:', mediaQuery.matches ? 'dark' : 'light');
+    console.log('Current saved theme:', localStorage.getItem('theme'));
+    console.log('Current website theme:', document.documentElement.getAttribute('data-theme'));
+};
 
 // Initialize theme on page load
 document.addEventListener('DOMContentLoaded', initTheme);
